@@ -1,0 +1,6 @@
+mutation createOwner($input: CreateOwnerInput!) {
+  createOwner(createOwnerInput: $input) {
+    id
+    name
+  }
+}

@@ -1,0 +1,6 @@
+query getOwners {
+  owners {
+    id
+    name
+  }
+}
