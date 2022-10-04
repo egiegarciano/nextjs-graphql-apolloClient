@@ -1,24 +1,25 @@
-import { useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useMutation } from '@apollo/client'
+import Cookies from 'js-cookie'
 
-import { CreateOwnerDocument } from '../../../graphql/generated/graphqlOperations'
+import { LoginDocument } from '../../../graphql/generated/graphqlOperations'
 
-const SignUp: NextPage = () => {
+const Login: NextPage = () => {
   const router = useRouter()
-  const [createOwner, { loading }] = useMutation(CreateOwnerDocument)
+  const [login, { loading }] = useMutation(LoginDocument)
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
     const data = {
-      name: event.target.password.value,
       username: event.target.username.value,
       password: event.target.password.value,
     }
     console.log(data)
-    await createOwner({
+    await login({
       variables: { input: data },
+      onCompleted: (data) =>
+        Cookies.set('accessToken', data.login.access_token),
     })
     router.push('/')
   }
@@ -29,8 +30,6 @@ const SignUp: NextPage = () => {
         onSubmit={handleSubmit}
         className='flex w-[500px] flex-col bg-green-200 p-4'
       >
-        <label htmlFor='name'>Name</label>
-        <input type='text' name='name' id='name' required />
         <label htmlFor='username'>Username</label>
         <input type='text' name='username' id='username' required />
         <label htmlFor='password'>Password</label>
@@ -49,4 +48,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 
-export default SignUp
+export default Login

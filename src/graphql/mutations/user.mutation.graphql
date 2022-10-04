@@ -4,3 +4,14 @@ mutation createOwner($input: CreateOwnerInput!) {
     name
   }
 }
+
+mutation login($input: LoginUserInput!) {
+  login(loginUserInput: $input) {
+    access_token
+    owner {
+      id
+      name
+      username
+    }
+  }
+}
