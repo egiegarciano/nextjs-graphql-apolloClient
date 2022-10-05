@@ -15,13 +15,15 @@ const Login: NextPage = () => {
       username: event.target.username.value,
       password: event.target.password.value,
     }
-    console.log(data)
     await login({
       variables: { input: data },
       onCompleted: (data) =>
         Cookies.set('accessToken', data.login.access_token),
     })
-    router.push('/')
+
+    if (loading) <div>Loading...</div>
+
+    router.push('/dashboard')
   }
 
   return (

@@ -1,5 +1,12 @@
 import { verify } from 'jsonwebtoken'
 
+export type accessToken = {
+  exp: number
+  iat: number
+  sub: number
+  username: string
+}
+
 /**
  * A function that will decode the content associated in the token.
  *

@@ -1,18 +1,13 @@
 import type { GetServerSideProps, NextPage } from 'next'
-import Cookies from 'js-cookie'
-import decodeToken from '../../../lib/utlis/decodeToken'
+import Link from 'next/link'
 
 const Home: NextPage = () => {
-  const token = Cookies.get('accessToken')!
-
-  const decodedToken = decodeToken(token)
-
-  console.log(decodedToken, 'decodedToken')
-
   return (
     <div className='bg-black text-white'>
-      Home Page (pending)
-      <button className='mt-6 bg-orange-400 p-4'>Logout</button>
+      <div>Home Page (pending)</div>
+      <Link href='/login'>
+        <button className='mt-6 bg-orange-400 p-4'>Login</button>
+      </Link>
     </div>
   )
 }

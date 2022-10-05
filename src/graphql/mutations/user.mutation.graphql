@@ -15,3 +15,9 @@ mutation login($input: LoginUserInput!) {
     }
   }
 }
+
+mutation logout($input: LogoutInput!) {
+  logout(logoutInput: $input) {
+    message
+  }
+}
