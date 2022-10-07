@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verify } from 'jsonwebtoken'
+
+// jsonwebtoken cannot run on the Edge environment. You have to use a library that does
+// https://github.com/vercel/next.js/discussions/38227
 
 export function middleware(request: NextRequest) {
   const { nextUrl } = request

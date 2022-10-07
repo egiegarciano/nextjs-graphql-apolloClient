@@ -4,3 +4,12 @@ query getOwners {
     name
   }
 }
+
+query getCurrentUser {
+  me {
+    id
+    name
+    username
+    access_token
+  }
+}

@@ -1,45 +1,94 @@
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useMutation } from '@apollo/client'
+import { isApolloError, useMutation } from '@apollo/client'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import Cookies from 'js-cookie'
 
 import { LoginDocument } from '../../../graphql/generated/graphqlOperations'
+import { useState } from 'react'
+
+type Inputs = {
+  username: string
+  password: string
+}
 
 const Login: NextPage = () => {
   const router = useRouter()
-  const [login, { loading }] = useMutation(LoginDocument)
+  const [login, { error: loginError }] = useMutation(LoginDocument)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault()
-    const data = {
-      username: event.target.username.value,
-      password: event.target.password.value,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<Inputs>()
+
+  const onSubmit: SubmitHandler<Inputs> = async ({ username, password }) => {
+    setLoading(true)
+
+    try {
+      const { data: result } = await login({
+        variables: { input: { username, password } },
+      })
+
+      if (result?.login) {
+        Cookies.set('accessToken', result.login.access_token)
+        await router.push('/dashboard')
+        setLoading(false)
+      }
+    } catch (error: any) {
+      if (isApolloError(error)) {
+        error.graphQLErrors.forEach(({ extensions }) => {
+          if ((extensions.exception as any).response.sampleErrors) {
+            ;(extensions.exception as any).response.sampleErrors.forEach(
+              (fieldError: any) => {
+                setError(fieldError.property, { message: fieldError.message })
+              }
+            )
+          }
+          // Handle here the 'Credentials are not valid' error
+          // Also handle the BAD_USER_INPUT error
+        })
+      }
+
+      setLoading(false)
+      console.log(error, 'error in login')
     }
-    await login({
-      variables: { input: data },
-      onCompleted: (data) =>
-        Cookies.set('accessToken', data.login.access_token),
-    })
-
-    if (loading) <div>Loading...</div>
-
-    router.push('/dashboard')
   }
 
   return (
     <div className='flex h-screen items-center justify-center'>
-      <form
-        onSubmit={handleSubmit}
-        className='flex w-[500px] flex-col bg-green-200 p-4'
-      >
-        <label htmlFor='username'>Username</label>
-        <input type='text' name='username' id='username' required />
-        <label htmlFor='password'>Password</label>
-        <input type='password' name='password' id='password' required />
-        <button type='submit' className='mt-4 bg-green-600'>
-          Submit
-        </button>
-      </form>
+      {loading ? (
+        <div className='text-5xl'>Loading...</div>
+      ) : (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className='flex w-[500px] flex-col bg-green-200 p-4'
+        >
+          <label htmlFor='username'>Username</label>
+          <input
+            type='text'
+            {...register('username', {
+              required: 'Username is required.',
+              onBlur: (e) => console.log(e),
+            })}
+            id='username'
+          />
+          {errors.username && <p>{errors.username.message}</p>}
+
+          <label htmlFor='password'>Password</label>
+          <input
+            type='password'
+            {...register('password', { required: 'Password is required' })}
+            id='password'
+          />
+          {errors.password && <p>{errors.password?.message}</p>}
+          <button type='submit' className='mt-4 bg-green-600'>
+            Submit
+          </button>
+        </form>
+      )}
     </div>
   )
 }

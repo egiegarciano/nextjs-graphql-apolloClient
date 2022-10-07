@@ -1,39 +1,82 @@
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Cookies from 'js-cookie'
-import { useMutation } from '@apollo/client'
-import { LogoutDocument } from '../../../graphql/generated/graphqlOperations'
+import { useMutation, useQuery } from '@apollo/client'
 
 import decodeToken from '../../../lib/utlis/decodeToken'
+import {
+  LogoutDocument,
+  GetCurrentUserDocument,
+} from '../../../graphql/generated/graphqlOperations'
 
 const Dashboard: NextPage = () => {
-  const accessToken = Cookies.get('accessToken')
   const router = useRouter()
+  const accessToken = Cookies.get('accessToken')
+  const owner = decodeToken(accessToken ?? '')
 
-  const owner = decodeToken(accessToken!)
+  const [logout, { loading, error }] = useMutation(LogoutDocument)
+  // const {
+  //   data: me,
+  //   loading: meLoading,
+  //   error: meError,
+  //   refetch: meRefetch,
+  // } = useQuery(GetCurrentUserDocument)
 
-  const [logout, { loading }] = useMutation(LogoutDocument)
+  // try {
+  //   if (me?.me) {
+  //     console.log(me, 'getCurrentUser')
+  //   }
+  // } catch (error) {
+  //   console.log(error)
+  // }
+
+  // if (loading) return <div className='text-5xl'>Loading...</div>
+
+  let errorMessage: string | undefined
+
+  if (error) {
+    if (error.clientErrors) {
+      console.log(error.clientErrors, 'clientErrors')
+    }
+
+    if (error.graphQLErrors) {
+      console.log(error.graphQLErrors, 'graphQLErrors')
+    }
+
+    if (error.networkError) {
+      console.log(error.networkError, 'networkError')
+    }
+
+    console.log(error, 'errororororororor')
+  }
+
+  const submitHandler = async () => {
+    try {
+      const result = await logout({
+        variables: { input: { username: owner?.username } },
+      })
+
+      if (result.data?.logout) {
+        Cookies.remove('accessToken')
+        await router.push('/login')
+      }
+    } catch (error) {
+      console.log(error, 'error')
+    }
+  }
 
   return (
     <div>
-      <div>Welcome to dashboard</div>
-      <button
-        className='mt-6 bg-orange-400 p-4'
-        onClick={() =>
-          logout({ variables: { input: { username: owner?.username } } })
-            .then(() => {
-              Cookies.remove('accessToken')
-              router.push('/login')
-            })
-            .catch((err) => {
-              console.error(err.message)
-              Cookies.remove('accessToken')
-              router.push('/login')
-            })
-        }
-      >
-        Logout
-      </button>
+      {error ? (
+        <div>An eror has occured</div>
+      ) : (
+        <>
+          <div>Welcome to dashboard</div>
+          <button className='mt-6 bg-orange-400 p-4' onClick={submitHandler}>
+            Logout
+          </button>
+        </>
+      )}
     </div>
   )
 }
