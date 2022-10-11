@@ -1,44 +1,108 @@
-import { useState } from 'react'
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useMutation } from '@apollo/client'
+import Link from 'next/link'
+import { useState } from 'react'
+import { isApolloError, useMutation } from '@apollo/client'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
-import { CreateOwnerDocument } from '../../../graphql/generated/graphqlOperations'
+import { SignupDocument } from '../../../graphql/generated/graphqlOperations'
+import { parsedClassValidatorErrors } from '../../../lib/utlis/parsedClassValidatorErrors'
+
+type Inputs = {
+  name: string
+  username: string
+  password: string
+}
+
+const schema = yup
+  .object({
+    name: yup
+      .string()
+      .required('this is a custom message and this field is required')
+      .trim(),
+    username: yup.string().required().trim(),
+    password: yup.string().min(8).required().trim(),
+  })
+  .required()
 
 const SignUp: NextPage = () => {
   const router = useRouter()
-  const [createOwner, { loading }] = useMutation(CreateOwnerDocument)
+  const [createOwner] = useMutation(SignupDocument)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (event: any) => {
-    event.preventDefault()
-    const data = {
-      name: event.target.password.value,
-      username: event.target.username.value,
-      password: event.target.password.value,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<Inputs>({ resolver: yupResolver(schema), mode: 'onChange' })
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setLoading(true)
+
+    const input = {
+      name: data.name,
+      username: data.username,
+      password: data.password,
     }
-    console.log(data)
-    await createOwner({
-      variables: { input: data },
-    })
-    router.push('/')
+
+    try {
+      const { data: results } = await createOwner({
+        variables: { input },
+      })
+
+      if (results?.signup) {
+        await router.push('/login')
+        setLoading(false)
+      }
+    } catch (error: any) {
+      if (isApolloError(error)) {
+        const setErrors = parsedClassValidatorErrors(error)
+        if (setErrors) {
+          setErrors.forEach((fieldError: any) => {
+            setError(fieldError.property, { message: fieldError.message })
+          })
+        }
+      }
+
+      setLoading(false)
+      console.log(error, 'error in signup')
+    }
   }
 
   return (
     <div className='flex h-screen items-center justify-center'>
-      <form
-        onSubmit={handleSubmit}
-        className='flex w-[500px] flex-col bg-green-200 p-4'
-      >
-        <label htmlFor='name'>Name</label>
-        <input type='text' name='name' id='name' required />
-        <label htmlFor='username'>Username</label>
-        <input type='text' name='username' id='username' required />
-        <label htmlFor='password'>Password</label>
-        <input type='password' name='password' id='password' required />
-        <button type='submit' className='mt-4 bg-green-600'>
-          Submit
-        </button>
-      </form>
+      {loading ? (
+        <div className='text-5xl'>Loading...</div>
+      ) : (
+        <div className='flex flex-col'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='flex w-[500px] flex-col bg-green-200 p-4'
+          >
+            <label htmlFor='name'>Name</label>
+            <input type='text' {...register('name')} id='name' />
+            {errors.name && <p>{errors.name.message}</p>}
+            <label htmlFor='username'>Username</label>
+            <input type='text' {...register('username')} id='username' />
+            {errors.username && <p>{errors.username.message}</p>}
+            <label htmlFor='password'>Password</label>
+            <input type='password' {...register('password')} id='password' />
+            {errors.password && <p>{errors.password.message}</p>}
+            <button type='submit' className='mt-4 bg-green-600'>
+              Submit
+            </button>
+          </form>
+          <div className='mt-6 text-center'>
+            Already have an account?{' '}
+            <Link href='/login'>
+              <span className='cursor-pointer text-blue-600'>Login here.</span>
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

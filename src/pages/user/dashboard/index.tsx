@@ -34,22 +34,6 @@ const Dashboard: NextPage = () => {
 
   let errorMessage: string | undefined
 
-  if (error) {
-    if (error.clientErrors) {
-      console.log(error.clientErrors, 'clientErrors')
-    }
-
-    if (error.graphQLErrors) {
-      console.log(error.graphQLErrors, 'graphQLErrors')
-    }
-
-    if (error.networkError) {
-      console.log(error.networkError, 'networkError')
-    }
-
-    console.log(error, 'errororororororor')
-  }
-
   const submitHandler = async () => {
     try {
       const result = await logout({

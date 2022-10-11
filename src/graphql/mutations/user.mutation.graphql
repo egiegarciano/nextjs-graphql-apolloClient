@@ -1,7 +1,8 @@
-mutation createOwner($input: CreateOwnerInput!) {
-  createOwner(createOwnerInput: $input) {
+mutation signup($input: CreateOwnerInput!) {
+  signup(signupUserInput: $input) {
     id
     name
+    username
   }
 }
 
