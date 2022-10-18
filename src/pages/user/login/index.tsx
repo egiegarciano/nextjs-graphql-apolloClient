@@ -12,13 +12,13 @@ import { LoginDocument } from '../../../graphql/generated/graphqlOperations'
 import { parsedErrors } from '../../../lib/utlis/parsedErrors'
 
 type Inputs = {
-  username: string
+  email: string
   password: string
 }
 
 const schema = yup
   .object({
-    username: yup.string().required().trim(),
+    email: yup.string().email().required().trim(),
     password: yup.string().required().trim(),
   })
   .required()
@@ -36,12 +36,12 @@ const Login: NextPage = () => {
     setError,
   } = useForm<Inputs>({ mode: 'onChange', resolver: yupResolver(schema) })
 
-  const onSubmit: SubmitHandler<Inputs> = async ({ username, password }) => {
+  const onSubmit: SubmitHandler<Inputs> = async ({ email, password }) => {
     setLoading(true)
 
     try {
       const { data: result } = await login({
-        variables: { input: { username, password } },
+        variables: { input: { email, password } },
       })
 
       if (result?.login) {
@@ -51,6 +51,7 @@ const Login: NextPage = () => {
       }
     } catch (error: any) {
       if (isApolloError(error)) {
+        // Todo: parsed error comming from class-validator
         const setErrors = parsedErrors(error)
         setError(setErrors.property, setErrors.errorMessage)
         setGeneralError(setErrors.errorMessage.message)
@@ -72,23 +73,12 @@ const Login: NextPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className='flex w-[500px] flex-col bg-green-200 p-4'
           >
-            <label htmlFor='username'>Username</label>
-            <input
-              type='text'
-              {...register('username', {
-                required: 'Username is required.',
-                // onBlur: (e) => console.log(e),
-              })}
-              id='username'
-            />
-            {errors.username && <p>{errors.username.message}</p>}
+            <label htmlFor='email'>Email</label>
+            <input type='text' {...register('email')} id='email' />
+            {errors.email && <p>{errors.email.message}</p>}
 
             <label htmlFor='password'>Password</label>
-            <input
-              type='password'
-              {...register('password', { required: 'Password is required' })}
-              id='password'
-            />
+            <input type='password' {...register('password')} id='password' />
             {errors.password && <p>{errors.password?.message}</p>}
             <button type='submit' className='mt-4 bg-green-600'>
               Submit

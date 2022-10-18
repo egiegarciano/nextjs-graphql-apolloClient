@@ -1,6 +1,6 @@
 import { verify } from 'jsonwebtoken'
 
-export type accessToken = {
+export type accessTokenType = {
   exp: number
   iat: number
   sub: number

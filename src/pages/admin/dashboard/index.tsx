@@ -4,45 +4,28 @@ import Cookies from 'js-cookie'
 import { useMutation, useQuery } from '@apollo/client'
 
 import decodeToken from '../../../lib/utlis/decodeToken'
-import {
-  LogoutDocument,
-  GetCurrentUserDocument,
-} from '../../../graphql/generated/graphqlOperations'
+import { AdminLogoutDocument } from '../../../graphql/generated/graphqlOperations'
 import { useState } from 'react'
 
-const Dashboard: NextPage = () => {
+const AdminDashboard: NextPage = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const accessToken = Cookies.get('accessToken')
-  const owner = decodeToken(accessToken ?? '')
+  const accessToken = Cookies.get('adminAccessToken')
+  const admin = decodeToken(accessToken ?? '')
 
-  const [logout] = useMutation(LogoutDocument)
-  // const {
-  //   data: me,
-  //   loading: meLoading,
-  //   error: meError,
-  //   refetch: meRefetch,
-  // } = useQuery(GetCurrentUserDocument)
-
-  // try {
-  //   if (me?.me) {
-  //     console.log(me, 'getCurrentUser')
-  //   }
-  // } catch (error) {
-  //   console.log(error)
-  // }
+  const [logout] = useMutation(AdminLogoutDocument)
 
   const submitHandler = async () => {
     setLoading(true)
 
     try {
       const result = await logout({
-        variables: { input: { email: owner?.email } },
+        variables: { input: { email: admin?.email } },
       })
 
-      if (result.data?.logout) {
-        Cookies.remove('accessToken')
-        await router.push('/login')
+      if (result.data?.adminLogout) {
+        Cookies.remove('adminAccessToken')
+        await router.push('/admin/login')
         setLoading(false)
       }
     } catch (error) {
@@ -59,7 +42,7 @@ const Dashboard: NextPage = () => {
         </div>
       ) : (
         <>
-          <div>Welcome to dashboard</div>
+          <div>Welcome to Admin Dashboard</div>
           <button className='mt-6 bg-orange-400 p-4' onClick={submitHandler}>
             Logout
           </button>
@@ -75,4 +58,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 }
 
-export default Dashboard
+export default AdminDashboard

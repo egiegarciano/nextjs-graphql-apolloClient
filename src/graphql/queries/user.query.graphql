@@ -9,7 +9,7 @@ query getCurrentUser {
   me {
     id
     name
-    username
+    email
     access_token
   }
 }

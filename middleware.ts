@@ -5,8 +5,8 @@ import type { NextRequest } from 'next/server'
 // https://github.com/vercel/next.js/discussions/38227
 
 export function middleware(request: NextRequest) {
-  const { nextUrl } = request
   const accessToken = request.cookies.get('accessToken')
+  const adminAccessToken = request.cookies.get('adminAccessToken')
 
   if (request.nextUrl.pathname.startsWith('/login')) {
     if (accessToken) {
@@ -17,6 +17,18 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!accessToken) {
       return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith('/admin/dashboard')) {
+    if (!adminAccessToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith('/admin/login')) {
+    if (adminAccessToken) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url))
     }
   }
 

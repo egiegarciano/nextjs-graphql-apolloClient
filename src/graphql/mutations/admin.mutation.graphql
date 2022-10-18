@@ -1,0 +1,15 @@
+mutation adminLogin($input: LoginAdminInput!) {
+  adminLogin(loginAdminInput: $input) {
+    id
+    name
+    email
+    access_token
+    role
+  }
+}
+
+mutation adminLogout($input: LogoutInput!) {
+  adminLogout(logoutInput: $input) {
+    message
+  }
+}

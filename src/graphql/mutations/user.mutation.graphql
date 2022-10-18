@@ -2,7 +2,8 @@ mutation signup($input: CreateOwnerInput!) {
   signup(signupUserInput: $input) {
     id
     name
-    username
+    email
+    role
   }
 }
 
@@ -12,7 +13,7 @@ mutation login($input: LoginUserInput!) {
     owner {
       id
       name
-      username
+      email
     }
   }
 }

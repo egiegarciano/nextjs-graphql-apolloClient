@@ -1,0 +1,9 @@
+query getCurrentAdmin {
+  currentAdmin {
+    id
+    name
+    email
+    access_token
+    role
+  }
+}
