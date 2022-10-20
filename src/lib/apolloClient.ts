@@ -1,4 +1,5 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
+import { offsetLimitPagination } from '@apollo/client/utilities'
 import Cookies from 'js-cookie'
 
 const accessToken = Cookies.get('accessToken')

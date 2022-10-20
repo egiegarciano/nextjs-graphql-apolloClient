@@ -20,6 +20,8 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Todo: setup middleware other admin pages, return to login if no admin access token
+
   if (request.nextUrl.pathname.startsWith('/admin/dashboard')) {
     if (!adminAccessToken) {
       return NextResponse.redirect(new URL('/admin/login', request.url))

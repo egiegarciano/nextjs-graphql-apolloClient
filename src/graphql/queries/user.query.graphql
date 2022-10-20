@@ -13,3 +13,20 @@ query getCurrentUser {
     access_token
   }
 }
+
+query ownerPaginate($limit: Int, $page: Int) {
+  ownerPaginate(limit: $limit, page: $page) {
+    items {
+      id
+      name
+      email
+    }
+    meta {
+      itemCount
+      totalItems
+      itemsPerPage
+      totalPages
+      currentPage
+    }
+  }
+}
