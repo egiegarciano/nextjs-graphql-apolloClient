@@ -13,7 +13,7 @@ const AdminDashboard: NextPage = () => {
   const accessToken = Cookies.get('adminAccessToken')
   const admin = decodeToken(accessToken ?? '')
 
-  const [logout] = useMutation(AdminLogoutDocument)
+  const [logout] = useMutation(AdminLogoutDocument, { fetchPolicy: 'no-cache' })
 
   const submitHandler = async () => {
     setLoading(true)

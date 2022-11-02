@@ -25,7 +25,7 @@ const schema = yup
 
 const AdminLogin: NextPage = () => {
   const router = useRouter()
-  const [login] = useMutation(AdminLoginDocument)
+  const [login] = useMutation(AdminLoginDocument, { fetchPolicy: 'no-cache' })
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
 

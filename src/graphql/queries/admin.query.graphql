@@ -7,3 +7,12 @@ query getCurrentAdmin {
     role
   }
 }
+
+query adminPetList {
+  pets {
+    id
+    name
+    type
+    image
+  }
+}

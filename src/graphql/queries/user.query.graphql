@@ -14,8 +14,8 @@ query getCurrentUser {
   }
 }
 
-query ownerPaginate($limit: Int, $page: Int) {
-  ownerPaginate(limit: $limit, page: $page) {
+query ownerPaginate($limit: Int, $page: Int, $email: String) {
+  ownerPaginate(limit: $limit, page: $page, email: $email) {
     items {
       id
       name

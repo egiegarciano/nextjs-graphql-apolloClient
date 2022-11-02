@@ -13,3 +13,21 @@ mutation adminLogout($input: LogoutInput!) {
     message
   }
 }
+
+mutation createPet($input: CreatePetInput!, $image: Upload!) {
+  createPet(createPetInput: $input, image: $image) {
+    id
+    name
+    image
+    type
+  }
+}
+
+mutation updatePetImage($name: String!, $newImage: Upload!) {
+  updatePetImage(name: $name, newimage: $newImage) {
+    id
+    image
+    name
+    type
+  }
+}
