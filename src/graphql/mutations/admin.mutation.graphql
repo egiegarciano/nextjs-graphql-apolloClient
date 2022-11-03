@@ -23,8 +23,8 @@ mutation createPet($input: CreatePetInput!, $image: Upload!) {
   }
 }
 
-mutation updatePetImage($name: String!, $newImage: Upload!) {
-  updatePetImage(name: $name, newimage: $newImage) {
+mutation updatePetInfo($input: updatePetInput!, $newImage: Upload) {
+  updatePetInfo(updatePetInfo: $input, newimage: $newImage) {
     id
     image
     name

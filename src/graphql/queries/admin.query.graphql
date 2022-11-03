@@ -16,3 +16,12 @@ query adminPetList {
     image
   }
 }
+
+query getOnePet($id: Int!) {
+  getPet(id: $id) {
+    id
+    name
+    type
+    image
+  }
+}

@@ -33,7 +33,7 @@ const AdminPetList: NextPage = () => {
           ) : (
             data?.pets.map((data) => (
               <div key={data.id}>
-                <Link href={`/admin/pet-list/${data.name}`}>
+                <Link href={`/admin/pet-list/${data.id}`}>
                   <a className='text-red-800'>{data.name}</a>
                 </Link>
                 <Image
