@@ -1,20 +1,21 @@
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import Cookies from 'js-cookie'
+import { useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
+import Cookies from 'js-cookie'
 
-import decodeToken from '../../../lib/utlis/decodeToken'
 import {
   LogoutDocument,
   GetCurrentUserDocument,
 } from '../../../graphql/generated/graphqlOperations'
-import { useState } from 'react'
+import { decodeToken } from '../../../lib/utlis/decodeToken'
+import { joseJwtVerify } from '../../../lib/utlis/decodeToken'
 
 const Dashboard: NextPage = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const accessToken = Cookies.get('accessToken')
-  const owner = decodeToken(accessToken ?? '')
+  // const owner = decodeToken(accessToken!)
 
   const [logout] = useMutation(LogoutDocument)
   // const {
@@ -35,9 +36,12 @@ const Dashboard: NextPage = () => {
   const submitHandler = async () => {
     setLoading(true)
 
+    // kung e click ang logout if error, e logout nalang ditso or e extend ang token expiration
     try {
+      const payload = await joseJwtVerify(accessToken!)
+
       const result = await logout({
-        variables: { input: { email: owner?.email } },
+        variables: { input: { email: payload?.email as string } },
       })
 
       if (result.data?.logout) {

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Cookies from 'js-cookie'
 import { useMutation, useQuery } from '@apollo/client'
 
-import decodeToken from '../../../lib/utlis/decodeToken'
+import { decodeToken } from '../../../lib/utlis/decodeToken'
 import { AdminLogoutDocument } from '../../../graphql/generated/graphqlOperations'
 import { useState } from 'react'
 
@@ -18,6 +18,7 @@ const AdminDashboard: NextPage = () => {
   const submitHandler = async () => {
     setLoading(true)
 
+    // kung e click ang logout if error, e logout nalang ditso or e extend ang token expiration
     try {
       const result = await logout({
         variables: { input: { email: admin?.email } },

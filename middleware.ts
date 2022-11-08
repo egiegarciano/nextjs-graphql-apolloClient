@@ -3,13 +3,21 @@ import type { NextRequest } from 'next/server'
 
 // jsonwebtoken cannot run on the Edge environment. You have to use a library that does
 // https://github.com/vercel/next.js/discussions/38227
+import { jwtVerify } from 'jose'
 
-export function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('accessToken')
-  const adminAccessToken = request.cookies.get('adminAccessToken')
+export async function middleware(request: NextRequest) {
+  const accessToken = request.cookies.get('accessToken')!
+  const adminAccessToken = request.cookies.get('adminAccessToken')!
 
   if (request.nextUrl.pathname.startsWith('/login')) {
     if (accessToken) {
+      // put inside try catch
+      const { payload: userPayload } = await jwtVerify(
+        accessToken,
+        new TextEncoder().encode('hide-me')
+      )
+      console.log('userPayload', userPayload)
+
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }

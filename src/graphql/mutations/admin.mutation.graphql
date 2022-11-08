@@ -31,3 +31,12 @@ mutation updatePetInfo($input: updatePetInput!, $newImage: Upload) {
     type
   }
 }
+
+mutation confirmOwnerEmail($email: String!) {
+  confirmOwnerEmail(email: $email) {
+    id
+    name
+    email
+    role
+  }
+}

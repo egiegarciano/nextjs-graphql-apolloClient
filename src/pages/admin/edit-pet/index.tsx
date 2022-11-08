@@ -1,7 +1,8 @@
 import type { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { isApolloError, useMutation, useQuery } from '@apollo/client'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -40,8 +41,6 @@ const AdminCreatePet: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
 
-  console.log('get Pet Data', data)
-
   const {
     register,
     handleSubmit,
@@ -55,9 +54,6 @@ const AdminCreatePet: NextPage = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async ({ image, name, type }) => {
     setLoading(true)
-
-    console.log('image', image)
-    console.log('URL of Imagae', URL.createObjectURL(image[0] as any))
 
     try {
       const { data: result } = await updatePetInfo({
@@ -83,13 +79,21 @@ const AdminCreatePet: NextPage = () => {
     }
   }
 
-  // useEffect(() => {
-  //   if (isSubmitSuccessful) {
-  //     reset({ name: '', type: '' })
-  //   }
-  // }, [reset, isSubmitSuccessful])
-
   const [previewImage, setpreviewImage] = useState('')
+
+  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      // setpreviewImage(URL.createObjectURL(e.target.files?.[0] as any))
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setpreviewImage(reader.result as string)
+      }
+      reader.readAsDataURL(e.target.files?.[0])
+    } else {
+      setpreviewImage('')
+      // URL.revokeObjectURL(previewImage)
+    }
+  }
 
   console.log('previewImage', previewImage)
 
@@ -129,10 +133,7 @@ const AdminCreatePet: NextPage = () => {
               type='file'
               {...(register('image'),
               {
-                onChange: (e) =>
-                  setpreviewImage(
-                    URL.createObjectURL(e.target.files?.[0] as any)
-                  ),
+                onChange: onFileChange,
               })}
               id='image'
             />
@@ -142,11 +143,13 @@ const AdminCreatePet: NextPage = () => {
               Submit
             </button>
           </form>
-          {/* <Link href={previewImage}> */}
-          <a target='_blank' rel='noopener noreferrer' href={previewImage}>
-            Preview Image
-          </a>
-          {/* </Link> */}
+          {previewImage && (
+            // You can use blob both preview link and image but cannot use file reader with link image
+            // <a target='_blank' rel='noopener noreferrer' href={previewImage}>
+            //   Preview Image
+            // </a>
+            <Image src={previewImage} alt='dog' width='300' height='300' />
+          )}
         </div>
       )}
     </div>

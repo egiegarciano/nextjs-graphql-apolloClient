@@ -48,6 +48,7 @@ const SignUp: NextPage = () => {
       password: data.password,
     }
 
+    // Todo: create user after confirming email
     try {
       const { data: results } = await createOwner({
         variables: { input },

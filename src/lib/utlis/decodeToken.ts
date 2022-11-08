@@ -1,4 +1,5 @@
 import { verify } from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
 
 export type accessTokenType = {
   exp: number
@@ -12,13 +13,22 @@ export type accessTokenType = {
  *
  * @returns This will return the email/role associated on the token.
  */
-const decodeToken = (token: string) => {
+export const decodeToken = (token: string) => {
   try {
-    const decode: any = verify(token, 'hide-me')
-    return decode
+    return verify(token, 'hide-me') as any
   } catch (error) {
-    return undefined
+    console.log('error when decoding token', error)
   }
 }
 
-export default decodeToken
+export const joseJwtVerify = async (token: string) => {
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode('hide-me')
+    )
+    return payload
+  } catch (error) {
+    console.log('error when decoding token using jose', error)
+  }
+}
