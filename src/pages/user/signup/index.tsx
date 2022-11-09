@@ -9,6 +9,7 @@ import * as yup from 'yup'
 
 import { SignupDocument } from '../../../graphql/generated/graphqlOperations'
 import { parsedClassValidatorErrors } from '../../../lib/utlis/parsedClassValidatorErrors'
+import useUserStore from '../../../zustand/useUserStore'
 
 type Inputs = {
   name: string
@@ -31,6 +32,7 @@ const SignUp: NextPage = () => {
   const router = useRouter()
   const [createOwner] = useMutation(SignupDocument)
   const [loading, setLoading] = useState(false)
+  const addRegisterInfo = useUserStore((state) => state.addRegisterInfo)
 
   const {
     register,
@@ -41,6 +43,8 @@ const SignUp: NextPage = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setLoading(true)
+
+    addRegisterInfo(data)
 
     const input = {
       name: data.name,

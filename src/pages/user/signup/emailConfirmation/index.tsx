@@ -5,6 +5,7 @@ import { isApolloError, useMutation } from '@apollo/client'
 
 import { ConfirmOwnerEmailDocument } from '../../../../graphql/generated/graphqlOperations'
 import { joseJwtVerify } from '../../../../lib/utlis/decodeToken'
+import useUserStore from '../../../../zustand/useUserStore'
 
 const EmailConfirmation: NextPage = () => {
   const router = useRouter()
@@ -12,6 +13,8 @@ const EmailConfirmation: NextPage = () => {
 
   const [loading, setLoading] = useState(false)
   const [confirmEmail] = useMutation(ConfirmOwnerEmailDocument)
+  const registerInfo = useUserStore((state) => state.registerInfo)
+  console.log('registerInfo', registerInfo)
 
   const onClick = async () => {
     setLoading(true)
