@@ -9,6 +9,8 @@ import * as yup from 'yup'
 
 import { CreatePetDocument } from '../../../graphql/generated/graphqlOperations'
 import { parsedErrors } from '../../../lib/utlis/parsedErrors'
+import Form from '../../../components/atoms/Form'
+import Input from '../../../components/atoms/Input'
 
 type Inputs = {
   name: string
@@ -35,13 +37,13 @@ const AdminCreatePet: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [generalError, setGeneralError] = useState('')
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitSuccessful },
-    setError,
-    reset,
-  } = useForm<Inputs>({ mode: 'onChange', resolver: yupResolver(schema) })
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors, isSubmitSuccessful },
+  //   setError,
+  //   reset,
+  // } = useForm<Inputs>({ mode: 'onChange', resolver: yupResolver(schema) })
 
   const onSubmit: SubmitHandler<Inputs> = async ({ name, type, image }) => {
     setLoading(true)
@@ -69,12 +71,7 @@ const AdminCreatePet: NextPage = () => {
     }
   }
 
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset({ name: '', type: '' })
-    }
-  }, [reset, isSubmitSuccessful])
-
+  //  How to use useFormProps?
   return (
     <div className='flex h-screen items-center justify-center'>
       {loading ? (
@@ -84,26 +81,30 @@ const AdminCreatePet: NextPage = () => {
           {generalError && <div>{generalError}</div>}
           <div className='text-lg'>Create Pet</div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
+          <Form<Inputs>
+            onSubmit={onSubmit}
             className='flex w-[500px] flex-col bg-green-200 p-4'
           >
-            <label htmlFor='name'>Name</label>
-            <input type='text' {...register('name')} id='name' />
-            {errors.name && <p>{errors.name.message}</p>}
+            {({ register, formState: { errors }, setValue }) => (
+              <>
+                <label htmlFor='name'>Name</label>
+                <Input type='text' {...register('name')} id='name' />
+                {errors.name && <p>{errors.name.message}</p>}
 
-            <label htmlFor='type'>Type</label>
-            <input type='text' {...register('type')} id='type' />
-            {errors.type && <p>{errors.type?.message}</p>}
+                <label htmlFor='type'>Type</label>
+                <Input type='text' {...register('type')} id='type' />
+                {errors.type && <p>{errors.type?.message}</p>}
 
-            <label htmlFor='image'>Upload Image</label>
-            <input type='file' {...register('image')} id='image' />
-            {errors.image && <p>{errors.image.message}</p>}
+                <label htmlFor='image'>Upload Image</label>
+                <Input type='file' {...register('image')} id='image' />
+                {errors.image && <p>{errors.image.message}</p>}
 
-            <button type='submit' className='mt-4 bg-green-600'>
-              Submit
-            </button>
-          </form>
+                <button type='submit' className='mt-4 bg-green-600'>
+                  Submit
+                </button>
+              </>
+            )}
+          </Form>
 
           <Link href='/admin/pet-list'>
             <a className='text-blue-900'>Lists of pet here</a>

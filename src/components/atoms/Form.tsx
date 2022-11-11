@@ -1,32 +1,31 @@
 import React from 'react'
-import { useForm, UseFormProps } from 'react-hook-form'
+import {
+  FieldValues,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from 'react-hook-form'
 
-type Props = {
-  defaultValues: UseFormProps
-  children: any //React.Node
-  onSubmit: any
+type GenericProps = {
+  className?: string
 }
 
-// Search and reaview again typescript generics
+type FormProps<TFormValues extends FieldValues> = {
+  onSubmit: SubmitHandler<TFormValues>
+  children: (methods: UseFormReturn<TFormValues>) => React.ReactNode
+} & GenericProps
 
-// Make a reusable react hook form component with
-export default function Form({ defaultValues, children, onSubmit }: Props) {
-  const methods = useForm({ defaultValues })
-  const { handleSubmit } = methods
-
+const Form = <TFormValues extends Record<string, any> = Record<string, any>>({
+  onSubmit,
+  children,
+  className,
+}: FormProps<TFormValues>) => {
+  const methods = useForm<TFormValues>() // How to use useFormProps?
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {React.Children.map(children, (child) => {
-        return child.props.name
-          ? React.createElement(child.type, {
-              ...{
-                ...child.props,
-                register: methods.register,
-                key: child.props.name,
-              },
-            })
-          : child
-      })}
+    <form className={className} onSubmit={methods.handleSubmit(onSubmit)}>
+      {children(methods)}
     </form>
   )
 }
+
+export default Form
